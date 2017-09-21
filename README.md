@@ -11,7 +11,7 @@ Currently only supports [gorm](https://github.com/jinzhu/gorm).
 
 ### Usage.
 ```
-_ import github.com/Prabandham/paginator
+p import github.com/Prabandham/paginator
 
 
 type User struct{
@@ -28,7 +28,7 @@ func FindAllUsers() []User {
     var users  []User
     db, err := gorm.Open("postgres", ....)
     order_by := []string{"name asc"}
-    paginator := Paginatory{DB: &db, OrderBy: order_by, Page: "1", PerPage: "10"}
+    paginator := p.Paginator{DB: &db, OrderBy: order_by, Page: "1", PerPage: "10"}
     data := paginator.Paginate(&users)
 
     //data -> {
