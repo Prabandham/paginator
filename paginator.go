@@ -31,14 +31,25 @@ func (p *Paginator) Paginate(dataSource interface{}) *Data {
 	done := make(chan bool, 1)
 	var output Data
 	var count int
+  var offset int64
 
 	go countRecords(db, dataSource, done, &count)
-	db.Offset(p.Page).Limit(p.PerPage).Find(dataSource)
+
+  if p.Page == "1" {
+    offset = 0
+  } else {
+    tmpPerPage, _ := strconv.ParseInt(p.PerPage, 10, 32)
+    offset = tmpPerPage
+  }
+
+	db.Limit(p.PerPage).Offset(offset).Find(dataSource)
 	<-done
+
 	output.TotalRecords = count
 	output.Records = dataSource
 	output.CurrentPage = p.Page
 	output.TotalPages = getTotalPages(p.PerPage, count)
+
 	return &output
 }
 
@@ -52,5 +63,5 @@ func getTotalPages(perPage string, totalRecords int) int64 {
 	totalPages := float64(totalRecords) / float64(perPageInt)
 	// This stupid conversion is needed as golang does not have any round method.
 	// Chance for creating a new library ??
-	return int64(float64(totalPages) + float64(0.5))
+	return int64(float64(totalPages) + float64(1.0))
 }
