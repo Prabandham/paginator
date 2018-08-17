@@ -1,8 +1,9 @@
 package paginator
 
 import (
-	"github.com/jinzhu/gorm"
 	"strconv"
+
+	"github.com/jinzhu/gorm"
 )
 
 type Paginator struct {
@@ -31,16 +32,17 @@ func (p *Paginator) Paginate(dataSource interface{}) *Data {
 	done := make(chan bool, 1)
 	var output Data
 	var count int
-  var offset int64
+	var offset int64
 
 	go countRecords(db, dataSource, done, &count)
 
-  if p.Page == "1" {
-    offset = 0
-  } else {
-    tmpPerPage, _ := strconv.ParseInt(p.PerPage, 10, 32)
-    offset = tmpPerPage
-  }
+	if p.Page == "1" {
+		offset = 0
+	} else {
+		tmpPage, _ := strconv.ParseInt(p.Page, 10, 32)
+		tmpPerPage, _ := strconv.ParseInt(p.PerPage, 10, 32)
+		offset = (tmpPage - 1) * tmpPerPage
+	}
 
 	db.Limit(p.PerPage).Offset(offset).Find(dataSource)
 	<-done
